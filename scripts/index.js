@@ -9,7 +9,7 @@ let live = {
 const version = {
     web: () => {
         DiffCamEngine.init({
-            captureIntervalTime: 50,
+            captureIntervalTime: INTERVAL,
             captureCallback: i => {
                 live.value = i.score
                 audio.filter = i.score / 3 > 100 ? 100 : i.score / 3
@@ -249,7 +249,7 @@ const version = {
     }
 }
 
-onload = () => {
+const startVisual = () => {
     const param = new URL(window.location.href).searchParams.get("mode")
     version[param] ? version[param]() : version.web()
 }

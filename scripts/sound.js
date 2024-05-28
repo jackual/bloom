@@ -1,30 +1,65 @@
-let audio = {
-    _filter: 0,
-    get filter() {
-        return this._filter
-    },
-    set filter(value) {
-        if (value < 0 || value > 100) {
-            throw new Error(`filter value set to ${value}!`)
-            return false
-        }
-        this._filter = value
-        this.tracks[0].volume = value / 100
-        this.tracks[1].volume = 1 - (value / 100)
-    },
-    tracks: ["highpass", "lowpass"],
-    active: false
-}
+let audioclick = false, audio
 
 onclick = () => {
-    if (audio.active) return false
-    else audio.active = true
-    audio.tracks.map((i, j) => {
-        audio.tracks[j] = new Audio(`sound/${i}.wav`)
-        audio.tracks[j].oncanplaythrough = () => {
-            audio.tracks[j].loop = true
-            audio.tracks[j].play()
+    if (audioclick) return false;
+    audioclick = true;
+
+    let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    audio = {
+        _filter: 0,
+        filterNode: audioContext.createBiquadFilter(),
+        gainNodes: [audioContext.createGain(), audioContext.createGain()],
+        tracks: ["highpass", "lowpass"],
+
+        get filter() {
+            return this._filter;
+        },
+
+        set filter(value) {
+            if (value < 0 || value > 100) {
+                throw new Error(`filter value set to ${value}!`);
+                return false;
+            }
+
+            console.log(value)
+
+            this._filter = value;
+
+            let gainValue1 = value / 100;
+            let gainValue2 = 1 - (value / 100);
+
+            let currentTime = audioContext.currentTime;
+            this.gainNodes[0].gain.linearRampToValueAtTime(gainValue1, currentTime + INTERVAL / 1000);
+            this.gainNodes[1].gain.linearRampToValueAtTime(gainValue2, currentTime + INTERVAL / 1000);
+        },
+
+        loadTracks() {
+            this.tracks = this.tracks.map((type, index) => {
+                let track = new Audio(`sound/${type}.wav`);
+                track.loop = true;
+
+                let source = audioContext.createMediaElementSource(track);
+                source.connect(this.gainNodes[index]);
+                this.gainNodes[index].connect(audioContext.destination);
+
+                return track;
+            });
+        },
+
+        playTracks() {
+            this.tracks.forEach(track => track.play());
         }
-    })
-    audio.filter = 0
-}
+    }
+
+    audio.loadTracks();
+
+    audio.tracks.forEach(track => {
+        track.oncanplaythrough = () => {
+            audio.playTracks();
+        };
+    });
+
+    audio.filter = 0;
+    startVisual()
+};
