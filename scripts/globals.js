@@ -1,1 +1,1 @@
-const INTERVAL = 200
+const INTERVAL = 100

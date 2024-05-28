@@ -250,6 +250,7 @@ const version = {
 }
 
 const startVisual = () => {
+    document.querySelector("main").remove()
     const param = new URL(window.location.href).searchParams.get("mode")
     version[param] ? version[param]() : version.web()
 }

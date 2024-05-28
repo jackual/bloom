@@ -7,6 +7,7 @@
 
 body {
     overflow: hidden;
+    width: 100vw;
 }
 
 video {
@@ -15,4 +16,17 @@ video {
     position: fixed;
     object-fit: cover;
     opacity: .24;
+}
+
+main {
+    width: 90vw;
+    padding-left: 5vw;
+    display: block;
+    position: fixed;
+    top: 20px;
+    font-family: sans-serif;
+}
+
+main * {
+    line-height: 1.5 !important;
 }

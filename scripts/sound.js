@@ -22,8 +22,6 @@ onclick = () => {
                 return false;
             }
 
-            console.log(value)
-
             this._filter = value;
 
             let gainValue1 = value / 100;
